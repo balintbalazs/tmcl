@@ -65,9 +65,11 @@
 //! # use tmcl::Instruction;
 //! # use tmcl::Command;
 //! # use tmcl::Reply;
+//! # use tmcl::Error;
+//! # use tmcl::ErrStatus;
 //! #
 //! # struct MyInterface();
-//! # #[derive(Debug)]
+//! # #[derive(Debug, PartialEq)]
 //! # struct MyInterfaceError();
 //! #
 //! # impl MyInterface { fn new() -> Self {unimplemented!()} }
@@ -89,7 +91,7 @@
 //!
 //!     assert_eq!(
 //!         module.write_command(SAP::new(0, 3, [0u8, 0u8, 0u8, 0u8])),
-//!         Error::ProtocolError(ErrStatus::WrongType)
+//!         Err(Error::ProtocolError(ErrStatus::WrongType))
 //!     );
 //! }
 //! ```
