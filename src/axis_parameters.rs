@@ -59,28 +59,38 @@ macro_rules! axis_param_define_write {
     ($name:ident, u32) => {
         impl WriteableAxisParameter for $name {
             fn operand(&self) -> [u8; 4] {
-                [(self.0 >> 0) as u8, (self.0 >> 8) as u8, (self.0 >> 16) as u8 , (self.0 >> 24) as u8]
+                [
+                    (self.0 >> 0) as u8,
+                    (self.0 >> 8) as u8,
+                    (self.0 >> 16) as u8,
+                    (self.0 >> 24) as u8,
+                ]
             }
         }
     };
     ($name:ident, u16) => {
         impl WriteableAxisParameter for $name {
             fn operand(&self) -> [u8; 4] {
-                [(self.0 >> 0) as u8, (self.0 >> 8) as u8, 0u8 , 0u8]
+                [(self.0 >> 0) as u8, (self.0 >> 8) as u8, 0u8, 0u8]
             }
         }
     };
     ($name:ident, u8) => {
         impl WriteableAxisParameter for $name {
             fn operand(&self) -> [u8; 4] {
-                [(self.0 >> 0) as u8, 0u8, 0u8 , 0u8]
+                [(self.0 >> 0) as u8, 0u8, 0u8, 0u8]
             }
         }
     };
     ($name:ident, i32) => {
         impl WriteableAxisParameter for $name {
             fn operand(&self) -> [u8; 4] {
-                [(self.0 >> 0) as u8, (self.0 >> 8) as u8, (self.0 >> 16) as u8 , (self.0 >> 24) as u8]
+                [
+                    (self.0 >> 0) as u8,
+                    (self.0 >> 8) as u8,
+                    (self.0 >> 16) as u8,
+                    (self.0 >> 24) as u8,
+                ]
             }
         }
     };

@@ -1,19 +1,10 @@
 //! `Instruction`s available for the generic TMCM module.
 
-use instructions::Instruction;
 use instructions::DirectInstruction;
+use instructions::Instruction;
 
 pub use instructions::{
-    ROR,
-    ROL,
-    MST,
-    MVP,
-    RFS,
-    SIO,
-    GIO,
-    CALC,
-    MoveOperation,
-    ReferenceSearchAction,
+    MoveOperation, ReferenceSearchAction, CALC, GIO, MST, MVP, RFS, ROL, ROR, SIO,
 };
 
 /// SAP - Set Axis Parameter
@@ -30,7 +21,7 @@ pub struct SAP {
 }
 impl SAP {
     pub fn new(motor_number: u8, parameter_number: u8, operand: [u8; 4]) -> SAP {
-        SAP{
+        SAP {
             motor_number,
             parameter_number,
             operand,
@@ -69,7 +60,7 @@ pub struct GAP {
 }
 impl GAP {
     pub fn new(motor_number: u8, parameter_number: u8) -> GAP {
-        GAP{
+        GAP {
             motor_number,
             parameter_number,
         }
@@ -105,7 +96,7 @@ pub struct STAP {
 }
 impl STAP {
     pub fn new(motor_number: u8, parameter_number: u8) -> STAP {
-        STAP{
+        STAP {
             motor_number,
             parameter_number,
         }
@@ -142,7 +133,7 @@ pub struct RSAP {
 }
 impl RSAP {
     pub fn new(motor_number: u8, parameter_number: u8) -> STAP {
-        STAP{
+        STAP {
             motor_number,
             parameter_number,
         }

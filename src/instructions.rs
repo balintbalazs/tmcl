@@ -1,14 +1,11 @@
 //! TMCL Instructions
 
-#[cfg(feature="std")]
-use std::marker::PhantomData;
-#[cfg(not(feature="std"))]
+#[cfg(not(feature = "std"))]
 use core::marker::PhantomData;
+#[cfg(feature = "std")]
+use std::marker::PhantomData;
 
-use {
-    WriteableAxisParameter,
-    ReadableAxisParameter,
-};
+use {ReadableAxisParameter, WriteableAxisParameter};
 
 /// A `TMCL` `Instruction`
 pub trait Instruction {
@@ -37,7 +34,6 @@ pub trait DirectInstruction: Instruction {
 
 /// A type that can be used as a return value for an `Instruction`
 pub trait Return {
-
     /// The deserialization function.
     ///
     /// The argument of the deserialize function is the operand bytes array:
@@ -56,7 +52,12 @@ pub struct ROR {
     velocity: u32,
 }
 impl ROR {
-    pub fn new(motor_number: u8, velocity: u32) -> ROR {ROR{motor_number, velocity}}
+    pub fn new(motor_number: u8, velocity: u32) -> ROR {
+        ROR {
+            motor_number,
+            velocity,
+        }
+    }
 }
 impl Instruction for ROR {
     const INSTRUCTION_NUMBER: u8 = 1;
@@ -66,8 +67,8 @@ impl Instruction for ROR {
             (self.velocity & 0xff) as u8,
             ((self.velocity >> 8) & 0xff) as u8,
             ((self.velocity >> 16) & 0xff) as u8,
-            ((self.velocity >> 24) & 0xff) as u8
-        ]
+            ((self.velocity >> 24) & 0xff) as u8,
+        ];
     }
 
     fn type_number(&self) -> u8 {
@@ -91,7 +92,12 @@ pub struct ROL {
     velocity: u32,
 }
 impl ROL {
-    pub fn new(motor_number: u8, velocity: u32) -> ROL {ROL{motor_number, velocity}}
+    pub fn new(motor_number: u8, velocity: u32) -> ROL {
+        ROL {
+            motor_number,
+            velocity,
+        }
+    }
 }
 impl Instruction for ROL {
     const INSTRUCTION_NUMBER: u8 = 2;
@@ -101,8 +107,8 @@ impl Instruction for ROL {
             (self.velocity & 0xff) as u8,
             ((self.velocity >> 8) & 0xff) as u8,
             ((self.velocity >> 16) & 0xff) as u8,
-            ((self.velocity >> 24) & 0xff) as u8
-        ]
+            ((self.velocity >> 24) & 0xff) as u8,
+        ];
     }
 
     fn type_number(&self) -> u8 {
@@ -117,7 +123,6 @@ impl DirectInstruction for ROL {
     type Return = ();
 }
 
-
 /// MST - Motor Stop
 ///
 /// This instruction stops the motor.
@@ -126,13 +131,15 @@ pub struct MST {
     motor_number: u8,
 }
 impl MST {
-    pub fn new(motor_number: u8) -> MST {MST{motor_number}}
+    pub fn new(motor_number: u8) -> MST {
+        MST { motor_number }
+    }
 }
 impl Instruction for MST {
     const INSTRUCTION_NUMBER: u8 = 3;
 
     fn operand(&self) -> [u8; 4] {
-        return [0, 0, 0, 0]
+        return [0, 0, 0, 0];
     }
 
     fn type_number(&self) -> u8 {
@@ -177,37 +184,36 @@ pub struct MVP {
     value: MoveOperation,
 }
 impl MVP {
-    pub fn new(motor_number: u8, value: MoveOperation) -> MVP {MVP{motor_number, value}}
+    pub fn new(motor_number: u8, value: MoveOperation) -> MVP {
+        MVP {
+            motor_number,
+            value,
+        }
+    }
 }
 impl Instruction for MVP {
     const INSTRUCTION_NUMBER: u8 = 4;
 
     fn operand(&self) -> [u8; 4] {
         match self.value {
-            MoveOperation::Absolute(x) => {
-                [
-                    (x & 0xff) as u8,
-                    ((x >> 8) & 0xff) as u8,
-                    ((x >> 16) & 0xff) as u8,
-                    ((x >> 24) & 0xff) as u8
-                ]
-            },
-            MoveOperation::Relative(x) => {
-                [
-                    (x & 0xff) as u8,
-                    ((x >> 8) & 0xff) as u8,
-                    ((x >> 16) & 0xff) as u8,
-                    ((x >> 24) & 0xff) as u8
-                ]
-            },
-            MoveOperation::Coordinate(x) => {
-                [
-                    (x & 0xff) as u8,
-                    ((x >> 8) & 0xff) as u8,
-                    ((x >> 16) & 0xff) as u8,
-                    ((x >> 24) & 0xff) as u8
-                ]
-            },
+            MoveOperation::Absolute(x) => [
+                (x & 0xff) as u8,
+                ((x >> 8) & 0xff) as u8,
+                ((x >> 16) & 0xff) as u8,
+                ((x >> 24) & 0xff) as u8,
+            ],
+            MoveOperation::Relative(x) => [
+                (x & 0xff) as u8,
+                ((x >> 8) & 0xff) as u8,
+                ((x >> 16) & 0xff) as u8,
+                ((x >> 24) & 0xff) as u8,
+            ],
+            MoveOperation::Coordinate(x) => [
+                (x & 0xff) as u8,
+                ((x >> 8) & 0xff) as u8,
+                ((x >> 16) & 0xff) as u8,
+                ((x >> 24) & 0xff) as u8,
+            ],
         }
     }
 
@@ -223,7 +229,6 @@ impl DirectInstruction for MVP {
     type Return = ();
 }
 
-
 /// SAP - Set Axis Parameter
 ///
 /// Most parameters of a TMCM module can be adjusted individually for each axis.
@@ -237,9 +242,9 @@ pub struct SAP<T: WriteableAxisParameter> {
 }
 impl<T: WriteableAxisParameter> SAP<T> {
     pub fn new(motor_number: u8, axis_parameter: T) -> SAP<T> {
-        SAP{
+        SAP {
             motor_number,
-            axis_parameter
+            axis_parameter,
         }
     }
 }
@@ -275,7 +280,7 @@ pub struct GAP<T: ReadableAxisParameter> {
 }
 impl<T: ReadableAxisParameter> GAP<T> {
     pub fn new(motor_number: u8) -> GAP<T> {
-        GAP{
+        GAP {
             motor_number,
             phantom: PhantomData,
         }
@@ -311,7 +316,7 @@ pub struct STAP<T: WriteableAxisParameter> {
 }
 impl<T: WriteableAxisParameter> STAP<T> {
     pub fn new(motor_number: u8) -> STAP<T> {
-        STAP{
+        STAP {
             motor_number,
             phantom: PhantomData,
         }
@@ -402,7 +407,7 @@ impl RFS {
     pub fn new(motor_number: u8, action: ReferenceSearchAction) -> RFS {
         RFS {
             motor_number,
-            action
+            action,
         }
     }
 }
@@ -437,17 +442,27 @@ pub struct SIO {
 }
 impl SIO {
     pub fn new(bank_number: u8, port_number: u8, state: bool) -> Self {
-        SIO {bank_number, port_number, state}
+        SIO {
+            bank_number,
+            port_number,
+            state,
+        }
     }
 }
 impl Instruction for SIO {
     const INSTRUCTION_NUMBER: u8 = 14;
 
-    fn operand(&self) -> [u8; 4] {[self.state as u8, 0u8, 0u8, 0u8]}
+    fn operand(&self) -> [u8; 4] {
+        [self.state as u8, 0u8, 0u8, 0u8]
+    }
 
-    fn type_number(&self) -> u8 { self.port_number }
+    fn type_number(&self) -> u8 {
+        self.port_number
+    }
 
-    fn motor_bank_number(&self) -> u8 { self.bank_number }
+    fn motor_bank_number(&self) -> u8 {
+        self.bank_number
+    }
 }
 impl DirectInstruction for SIO {
     type Return = ();
@@ -467,17 +482,26 @@ pub struct GIO {
 }
 impl GIO {
     pub fn new(bank_number: u8, port_number: u8) -> Self {
-        GIO {bank_number, port_number}
+        GIO {
+            bank_number,
+            port_number,
+        }
     }
 }
 impl Instruction for GIO {
     const INSTRUCTION_NUMBER: u8 = 15;
 
-    fn operand(&self) -> [u8; 4] {[0u8, 0u8, 0u8, 0u8]}
+    fn operand(&self) -> [u8; 4] {
+        [0u8, 0u8, 0u8, 0u8]
+    }
 
-    fn type_number(&self) -> u8 { self.port_number }
+    fn type_number(&self) -> u8 {
+        self.port_number
+    }
 
-    fn motor_bank_number(&self) -> u8 { self.bank_number }
+    fn motor_bank_number(&self) -> u8 {
+        self.bank_number
+    }
 }
 impl DirectInstruction for GIO {
     type Return = u32;
@@ -522,16 +546,61 @@ impl Instruction for CALC {
 
     fn operand(&self) -> [u8; 4] {
         match self {
-            CALC::Add(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
-            CALC::Sub(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
-            CALC::Mul(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
-            CALC::Div(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
-            CALC::Mod(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
-            CALC::And(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
-            CALC::Or(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
-            CALC::Xor(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
+            CALC::Add(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
+            CALC::Sub(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
+            CALC::Mul(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
+            CALC::Div(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
+            CALC::Mod(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
+            CALC::And(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
+            CALC::Or(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
+            CALC::Xor(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
             CALC::Not => [0u8, 0u8, 0u8, 0u8],
-            CALC::Load(x) => [(x >> 0) as u8, (x >> 8) as u8, (x >> 16) as u8, (x >> 24) as u8],
+            CALC::Load(x) => [
+                (x >> 0) as u8,
+                (x >> 8) as u8,
+                (x >> 16) as u8,
+                (x >> 24) as u8,
+            ],
         }
     }
 
@@ -550,7 +619,9 @@ impl Instruction for CALC {
         }
     }
 
-    fn motor_bank_number(&self) -> u8 { 0 }
+    fn motor_bank_number(&self) -> u8 {
+        0
+    }
 }
 impl DirectInstruction for CALC {
     type Return = ();

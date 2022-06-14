@@ -219,10 +219,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod lib {
-    #[cfg(feature = "std")]
-    pub use std::*;
     #[cfg(not(feature = "std"))]
     pub use core::*;
+    #[cfg(feature = "std")]
+    pub use std::*;
 }
 
 extern crate interior_mut;
@@ -248,14 +248,14 @@ use instructions::Return;
 pub trait Interface {
     type Error;
 
-    fn transmit_command<T: Instruction>(&mut self, command: &Command<T>) -> Result<(), Self::Error>;
+    fn transmit_command<T: Instruction>(&mut self, command: &Command<T>)
+        -> Result<(), Self::Error>;
     fn receive_reply(&mut self) -> Result<Reply, Self::Error>;
 }
 
 /// All possible errors when communicating with
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Error<T> {
-
     /// This means that the library was not able to get the mutable reference to the interface.
     ///
     /// This can be cause by many different things
@@ -349,7 +349,10 @@ pub enum Status {
 
 impl<T: Instruction> Command<T> {
     pub fn new(module_address: u8, instruction: T) -> Command<T> {
-        Command{module_address, instruction}
+        Command {
+            module_address,
+            instruction,
+        }
     }
 
     /// Returns the module address
@@ -389,7 +392,6 @@ impl<T: Instruction> Command<T> {
             self.instruction.operand()[0],
         ]
     }
-
 }
 
 impl Reply {
@@ -440,7 +442,9 @@ impl Status {
 pub struct NonValidErrorCode;
 
 impl Return for () {
-    fn from_operand(_operand: [u8; 4]) -> () {()}
+    fn from_operand(_operand: [u8; 4]) -> () {
+        ()
+    }
 }
 
 impl Return for [u8; 4] {
@@ -450,12 +454,17 @@ impl Return for [u8; 4] {
 }
 
 impl Return for bool {
-    fn from_operand(array: [u8; 4]) -> bool {(array[0] & 1) != 0}
+    fn from_operand(array: [u8; 4]) -> bool {
+        (array[0] & 1) != 0
+    }
 }
 
 impl Return for i32 {
     fn from_operand(array: [u8; 4]) -> i32 {
-        (array[0] as u32 | ((array[1] as u32) << 8) |  ((array[2] as u32) << 16) |((array[3] as u32) << 24)) as i32
+        (array[0] as u32
+            | ((array[1] as u32) << 8)
+            | ((array[2] as u32) << 16)
+            | ((array[3] as u32) << 24)) as i32
     }
 }
 
@@ -473,7 +482,10 @@ impl Return for i8 {
 
 impl Return for u32 {
     fn from_operand(array: [u8; 4]) -> u32 {
-        (array[0] as u32 | ((array[1] as u32) << 8) |  ((array[2] as u32) << 16) |((array[3] as u32) << 24))
+        (array[0] as u32
+            | ((array[1] as u32) << 8)
+            | ((array[2] as u32) << 16)
+            | ((array[3] as u32) << 24))
     }
 }
 

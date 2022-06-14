@@ -1,29 +1,13 @@
 //! All instructions available for TMCM modules other than TMCM-100 and Monopack 2.
 
 pub use instructions::{
-    ROR,
-    ROL,
-    MST,
-    MVP,
-    SAP,
-    GAP,
+    MoveOperation, ReferenceSearchAction, CALC, GAP, GIO, MST, MVP, RFS, ROL, ROR, RSAP, SAP, SIO,
     STAP,
-    RSAP,
-    RFS,
-    SIO,
-    GIO,
-    CALC,
-    MoveOperation,
-    ReferenceSearchAction,
 };
 
 use modules::tmcm::TmcmInstruction;
 
-use modules::tmcm::{
-    WriteableTmcmAxisParameter,
-    ReadableTmcmAxisParameter,
-};
-
+use modules::tmcm::{ReadableTmcmAxisParameter, WriteableTmcmAxisParameter};
 
 impl TmcmInstruction for ROR {}
 impl TmcmInstruction for ROL {}

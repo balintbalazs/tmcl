@@ -7,22 +7,27 @@
 
 pub mod instructions;
 
-use lib::ops::Deref;
 use lib::marker::PhantomData;
+use lib::ops::Deref;
 
 use interior_mut::InteriorMut;
 
+use instructions::DirectInstruction;
+use Command;
 use Error;
 use Instruction;
-use instructions::DirectInstruction;
 use Interface;
 use Return;
 use Status;
-use Command;
 
 /// This type represents a generic TMCM module.
 #[derive(Debug)]
-pub struct GenericModule<'a, IF: Interface + 'a, Cell: InteriorMut<'a, IF>, T: Deref<Target=Cell> + 'a> {
+pub struct GenericModule<
+    'a,
+    IF: Interface + 'a,
+    Cell: InteriorMut<'a, IF>,
+    T: Deref<Target = Cell> + 'a,
+> {
     /// The module address
     address: u8,
     interface: T,
@@ -30,22 +35,34 @@ pub struct GenericModule<'a, IF: Interface + 'a, Cell: InteriorMut<'a, IF>, T: D
     pd2: PhantomData<&'a T>,
 }
 
-impl<'a, IF: Interface, Cell: InteriorMut<'a, IF>, T: Deref<Target=Cell>> GenericModule<'a, IF, Cell, T> {
+impl<'a, IF: Interface, Cell: InteriorMut<'a, IF>, T: Deref<Target = Cell>>
+    GenericModule<'a, IF, Cell, T>
+{
     /// Create a new module
     pub fn new(interface: T, address: u8) -> Self {
-        GenericModule{
+        GenericModule {
             address,
             interface,
-            pd1: PhantomData{},
-            pd2: PhantomData{},
+            pd1: PhantomData {},
+            pd2: PhantomData {},
         }
     }
 
     /// Synchronously write a command and wait for the Reply
-    pub fn write_command<Inst: Instruction + DirectInstruction>(&'a self, instruction: Inst) -> Result<Inst::Return, Error<IF::Error>> {
-        let mut interface = self.interface.borrow_int_mut().or(Err(Error::InterfaceUnavailable))?;
-        interface.transmit_command(&Command::new(self.address, instruction)).map_err(|e| Error::InterfaceError(e))?;
-        let reply = interface.receive_reply().map_err(|e| Error::InterfaceError(e))?;
+    pub fn write_command<Inst: Instruction + DirectInstruction>(
+        &'a self,
+        instruction: Inst,
+    ) -> Result<Inst::Return, Error<IF::Error>> {
+        let mut interface = self
+            .interface
+            .borrow_int_mut()
+            .or(Err(Error::InterfaceUnavailable))?;
+        interface
+            .transmit_command(&Command::new(self.address, instruction))
+            .map_err(|e| Error::InterfaceError(e))?;
+        let reply = interface
+            .receive_reply()
+            .map_err(|e| Error::InterfaceError(e))?;
         match reply.status() {
             Status::Ok(_) => Ok(<Inst::Return as Return>::from_operand(reply.operand())),
             Status::Err(e) => Err(e.into()),
