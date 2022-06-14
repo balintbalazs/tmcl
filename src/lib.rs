@@ -365,7 +365,7 @@ impl<T: Instruction> Command<T> {
     /// The array will look like the following:
     /// `[MODULE_ADR, CMD_N, TYPE_N, MOTOR_N, VALUE3, VALUE2, VALUE1, VALUE0, CHECKSUM]`
     pub fn serialize(&self) -> [u8; 9] {
-        [
+        let mut data = [
             self.module_address,
             T::INSTRUCTION_NUMBER,
             self.instruction.type_number(),
@@ -374,8 +374,10 @@ impl<T: Instruction> Command<T> {
             self.instruction.operand()[2],
             self.instruction.operand()[1],
             self.instruction.operand()[0],
-            self.calculate_checksum(),
-        ]
+            0,
+        ];
+        data[8] = Self::calculate_checksum(&data);
+        data
     }
 
     /// Serialize into binary command format suited for I2C
@@ -403,8 +405,8 @@ impl<T: Instruction> Command<T> {
         ]
     }
 
-    fn calculate_checksum(&self) -> u8 {
-        self.instruction.operand().iter().fold(0u8, |sum, x| sum.overflowing_add(*x).0)
+    fn calculate_checksum(bytes: &[u8]) -> u8 {
+        bytes.iter().fold(0u8, |sum, &x| sum.overflowing_add(x).0)
     }
 }
 
@@ -496,10 +498,10 @@ impl Return for i8 {
 
 impl Return for u32 {
     fn from_operand(array: [u8; 4]) -> u32 {
-        (array[0] as u32
+        array[0] as u32
             | ((array[1] as u32) << 8)
             | ((array[2] as u32) << 16)
-            | ((array[3] as u32) << 24))
+            | ((array[3] as u32) << 24)
     }
 }
 
@@ -518,5 +520,53 @@ impl Return for u8 {
 impl<T> From<ErrStatus> for Error<T> {
     fn from(es: ErrStatus) -> Self {
         Error::ProtocolError(es)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct TestInstruction {
+        type_number: u8,
+        motor_bank_number: u8,
+        operand: [u8; 4],
+    }
+
+    impl Instruction for TestInstruction {
+        const INSTRUCTION_NUMBER: u8 = 255;
+
+        fn type_number(&self) -> u8 {
+            self.type_number
+        }
+
+        fn motor_bank_number(&self) -> u8 {
+            self.motor_bank_number
+        }
+
+        fn operand(&self) -> [u8; 4] {
+            self.operand
+        }
+    }
+
+    #[test]
+    fn correct_checksum() {
+        let type_number = 1;
+        let motor_bank_number = 2;
+        let operand = [1, 2, 3, 4];
+        let instruction = TestInstruction {
+            type_number,
+            motor_bank_number,
+            operand,
+        };
+
+        let command = Command::new(0, instruction);
+        let bytes = command.serialize();
+        #[cfg(feature = "std")]
+        {
+            dbg!(&bytes);
+        }
+        assert_eq!(bytes[8], 12);
+        assert_eq!(bytes[4], 4);
     }
 }
