@@ -365,7 +365,17 @@ impl<T: Instruction> Command<T> {
     /// The array will look like the following:
     /// `[MODULE_ADR, CMD_N, TYPE_N, MOTOR_N, VALUE3, VALUE2, VALUE1, VALUE0, CHECKSUM]`
     pub fn serialize(&self) -> [u8; 9] {
-        unimplemented!()
+        [
+            self.module_address,
+            T::INSTRUCTION_NUMBER,
+            self.instruction.type_number(),
+            self.instruction.motor_bank_number(),
+            self.instruction.operand()[3],
+            self.instruction.operand()[2],
+            self.instruction.operand()[1],
+            self.instruction.operand()[0],
+            self.calculate_checksum(),
+        ]
     }
 
     /// Serialize into binary command format suited for I2C
@@ -391,6 +401,10 @@ impl<T: Instruction> Command<T> {
             self.instruction.operand()[1],
             self.instruction.operand()[0],
         ]
+    }
+
+    fn calculate_checksum(&self) -> u8 {
+        self.instruction.operand().iter().fold(0u8, |sum, x| sum.overflowing_add(*x).0)
     }
 }
 
