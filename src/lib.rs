@@ -428,11 +428,11 @@ impl Reply {
         }
     }
 
-    fn operand(&self) -> [u8; 4] {
+    pub fn operand(&self) -> [u8; 4] {
         self.operand
     }
 
-    fn status(&self) -> Status {
+    pub fn status(&self) -> Status {
         self.status
     }
 }
