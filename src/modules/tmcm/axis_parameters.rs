@@ -304,6 +304,21 @@ impl MicrostepResolution {
             _ => Err(()),
         }
     }
+    
+    pub fn try_from_scaled(v: u16) -> Result<Self, ()> {
+        match v {
+            1 => Ok(MicrostepResolution::Full),
+            2 => Ok(MicrostepResolution::Half),
+            4 => Ok(MicrostepResolution::Micro4),
+            8 => Ok(MicrostepResolution::Micro8),
+            16 => Ok(MicrostepResolution::Micro16),
+            32 => Ok(MicrostepResolution::Micro32),
+            64 => Ok(MicrostepResolution::Micro64),
+            128 => Ok(MicrostepResolution::Micro128),
+            256 => Ok(MicrostepResolution::Micro256),
+            _ => Err(()),
+        }
+    }
 }
 impl AxisParameter for MicrostepResolution {
     const NUMBER: u8 = 140;
