@@ -290,7 +290,7 @@ pub enum MicrostepResolution {
     Micro256 = 8,
 }
 impl MicrostepResolution {
-    fn try_from_u8(v: u8) -> Result<Self, ()> {
+    pub fn try_from_u8(v: u8) -> Result<Self, ()> {
         match v {
             0 => Ok(MicrostepResolution::Full),
             1 => Ok(MicrostepResolution::Half),
