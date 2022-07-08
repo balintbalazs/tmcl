@@ -240,7 +240,7 @@ mod axis_parameters;
 pub mod modules;
 
 pub use instructions::Instruction;
-use instructions::Return;
+pub use instructions::Return;
 
 /// A interface for a TMCM module
 ///
