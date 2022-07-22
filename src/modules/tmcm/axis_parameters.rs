@@ -380,6 +380,23 @@ impl TmcmAxisParameter for PulseDivisor {}
 impl ReadableTmcmAxisParameter for PulseDivisor {}
 impl WriteableTmcmAxisParameter for PulseDivisor {}
 
+axis_param_r!(
+    /// Vsense
+    ///
+    /// Sense resistor voltage based current scaling.
+    /// 
+    /// 0 - Full scale sense resistor voltage is 1/18 VDD
+    /// 
+    /// 1 - Full scale sense resistor voltage is 1/36 VDD
+    /// 
+    /// Leave at default value. Do not change!
+    Vsense,
+    bool,
+    179
+);
+impl TmcmAxisParameter for Vsense {}
+impl ReadableTmcmAxisParameter for Vsense {}
+
 /// Reference search mode
 /// 
 /// 1. Search left stop switch only.
@@ -540,7 +557,7 @@ impl ReadableTmcmAxisParameter for EndSwitchDistance {}
 axis_param_r!(
     /// Last reference position
     ///
-    /// TThis parameter contains the last position value before the position
+    /// This parameter contains the last position value before the position
     /// counter is set to zero during reference search.
     LastReferencePosition,
     i32,
